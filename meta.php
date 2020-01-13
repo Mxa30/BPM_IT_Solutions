@@ -1,6 +1,7 @@
 <html>
-
 <head>
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.6.2/firebase-app.js"></script>
 
@@ -21,10 +22,3 @@
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     </script>
-</head>
-
-<body>
-
-</body>
-
-</html>

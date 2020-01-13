@@ -1,3 +1,9 @@
+<title>temp title</title>
+<link rel="stylesheet"  type="text/css" href="style.css">
+</head>
+
+<body>
+
   <main>
     <div id="ItemLijstID">
       <div class="ItemsHead">
@@ -48,3 +54,4 @@
     </div>
   </main>
 </body>
+</html>
