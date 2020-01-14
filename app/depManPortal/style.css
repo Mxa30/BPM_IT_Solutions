@@ -21,3 +21,10 @@ thead tr {
 tr:nth-child(odd) {
     background-color: #ccc;
 }
+
+.PageTitle{
+    position: relative;
+    left: 5%;
+    width: 90%;
+    border: 5px solid #73AD21;
+}
