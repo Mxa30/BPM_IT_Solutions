@@ -39,12 +39,7 @@
                         <tr>
                             <td>Prijs:</td>
                             <td>
-                                <select name="Prijs">
-                                    <?php
-                      echo "Prijs <br />";
-                  ?>
-
-                                </select>
+                                
                                 <input type="text" name="search" placeholder="Vul prijs in" id="searchInputID">
                                 <button type="submit" name="submit" id="searchButtonID"> Item toevoegen
                             </td>
