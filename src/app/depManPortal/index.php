@@ -4,6 +4,13 @@
 
 <body>
 
+<?php
+  $sql = "select O.id, O.employee_name, O.prod_id P.name
+  from Order O
+  inner join Product P on O.prod_id = P.id
+  where {$_SESSION['department']};"
+?>
+
     <main>
       <div class="PageTitle">
         <center><h1>binnengekomen verzoeken</h1></center>
