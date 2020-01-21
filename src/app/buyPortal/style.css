@@ -30,6 +30,10 @@ thead tr{
     background-color: #ccc;
 }
 
+textarea {
+  resize: none;
+}
+
 /* PRODUCTS */
 .prodContainer h2 {
   text-align: center;
@@ -52,7 +56,7 @@ thead tr{
   text-align: center;
 }
 
-.sendReqForm {
+.sendCart{
   float: right;
   margin-top: 10px
 }

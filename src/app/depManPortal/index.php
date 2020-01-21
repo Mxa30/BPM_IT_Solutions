@@ -1,332 +1,86 @@
-<?php include "../../meta.php";?>
+<?php
+include "../../meta.php";
+include "functions.php";
+?>
 <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
 <body>
-
-<?php
-  $sql = "select O.id, O.employee_name, O.prod_id P.name
-  from Order O
-  inner join Product P on O.prod_id = P.id
-  where {$_SESSION['department']};"
-?>
+    <?php
+    // INCLUDE THE HEADER AND IT'S STYLESHEET
+      include APP_PATH . "/header/index.php";
+      include APP_PATH . "/header/functions.php";
+      echo ("<link rel='stylesheet' href='" . APP_PATH . "/header/style.css". "'>");
+    ?>
 
     <main>
-      <div class="PageTitle">
-        <center><h1>binnengekomen verzoeken</h1></center>
+      <div class="ordersContainer">
+        <h2>Binnengekomen verzoeken</h2>
+        <table class="ordersTable">
+          <thead>
+            <th>Naam</th>
+            <th>Product</th>
+            <th>Totaalprijs</th>
+            <th>Aantal</th>
+            <th>Reden</th>
+            <th>Actie</th>
+          </thead>
+          <tbody>
+            <?php
+
+              $orders = [];
+              while ($record = mysqli_fetch_assoc($sqlGetOrderResult)) {
+                $orders[] = $record;
+              }
+              $_SESSION['orders'] = $orders;
+              if (!empty($_SESSION['orders'])) {
+                foreach($_SESSION['orders'] as $record){
+                  $totalPrice = $record['price']*$record['amount'];
+                  echo(
+                    "
+                    <tr>
+                    <td>{$record['empName']}</td>
+                    <td>{$record['prodName']}</td>
+                    <td>€{$totalPrice}</td>
+                    <td>{$record['amount']}</td>
+                    <td>{$record['reason']}</td>
+                    <td>
+                    <form method='post'>
+                    <button type='submit' name='accept{$record['id']}'>Goedkeuren</button>
+                    </form>
+                    <form method='post'>
+                    <select name='reason{$record['id']}'>
+                    <option value='1'>Recent al gekocht</option>
+                    <option value='2'>Overbodig artikel</option>
+                    <option value='3'>Geen budget voor</option>
+                    <option value='4'>Niet meer leverbaar</option>
+                    <option value='5'>Externe omstandigheden</option>
+                    </select>
+                    <textarea name='budgetReason{$record['id']}' placeholder='Vul alleen in als er geen budget is'></textarea>
+                    <button type='submit' name='deny{$record['id']}'>Afkeuren</button>
+                    </form>
+                    </td>
+                    </tr>
+                    "
+                  );
+                }
+              }else {
+                echo(
+                  "
+                  <tr>
+                  <table class='emptyTable'>
+                    <tr>
+                      <td>Er zijn geen nieuwe verzoeken meer</td>
+                    </tr>
+                  </table>
+                  </tr>
+                  "
+                );
+              }
+            ?>
+          </tbody>
+        </table>
       </div>
-        <center><table>
-            <thead>
-                <th>Naam</th>
-                <th>Product</th>
-                <th>Leverancier</th>
-                <th>Prijs</th>
-                <th>Reden</th>
-                <th>Actie</th>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Rien</td>
-                    <td>Pennen</td>
-                    <td>BIC</td>
-                    <td>€3,50</td>
-                    <td>Mijn pennen zijn allemaal leeg.</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Piet</td>
-                    <td>Printer inkt</td>
-                    <td>CANNON</td>
-                    <td>€21,30</td>
-                    <td>Ik vind de tint inkt niet zo mooi die we nu hebben.</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Stinnoe</td>
-                    <td>Laptop</td>
-                    <td>Lenovo</td>
-                    <td>€640</td>
-                    <td>Mijn huidige laptop valt vaak uit.</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Daan</td>
-                    <td>Iphone 11</td>
-                    <td>Apple</td>
-                    <td>€960</td>
-                    <td>Ik moet vaak bellen met klanten mijn prive telefoon is verouderd</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>Test</td>
-                    <td>
-                        <button>Goedkeuren</button>
-                        <form action="#" method="post">
-                        <select name="Reden van afkeuring">
-                        <option value="Recent al gekocht">Recent al gekocht</option>
-                        <option value="Overbodig artikel">Overbodig artikel</option>
-                        <option value="Geen budget voor">Geen budget voor</option>
-                        <option value="Niet meer leverbaar">Niet meer leverbaar</option>
-                        <option value="Externe omstandigheden">Externe omstandigheden</option>
-                        </select>
-                        <input type="submit" name="submit" value="Afkeuren" />
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table></center>
     </main>
 
 </body>
