@@ -6,7 +6,7 @@ include "functions.php";
 </head>
 
 <body>
-    <!-- <main>
+<!--<main>
         <div id="ItemLijstID">
             <div class="ItemsHead">
                 <h2>Items</h2>
@@ -80,6 +80,8 @@ include "functions.php";
                     <form method='post'>
                       <select name='amount{$record['id']}'>{$options}</select>
                       <input type='submit' name='button{$record['id']}' value='Add to cart'>
+                      <textarea name="comment" rows="5" cols="40"></textarea>
+
                     </form>
                   </td>
                 </tr>"
