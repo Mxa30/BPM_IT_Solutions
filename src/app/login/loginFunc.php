@@ -2,25 +2,28 @@
 // Login functie
 function loginFunc($email, $pass, $conn) {
   $sqlLoginQ = "
-  select email, password, is_dept_manager
+  select id, name, department_name, is_dept_manager, email, password
   from Employee
-  where email = '{$email}' and password = '$pass'";
+  where email = '{$email}' and password = '{$pass}'";
   $sqlLoginResult = mysqli_query($conn, $sqlLoginQ);
   while ($record = mysqli_fetch_assoc($sqlLoginResult)) {
     if (filter_var($email,FILTER_SANITIZE_EMAIL)==true || filter_var($pass,FILTER_SANITIZE_STRING)==true && $record['email'] == $email && $record['password'] == $pass) {
-      if ($record['is_dept_manager'] === true) {
+      if ($record['is_dept_manager'] == true) {
         // Setting session variables for department manager
+
         $_SESSION['logged'] = true;
         $_SESSION['is_dept_manager'] = true;
+        $_SESSION['employee_id'] = $record['id'];
         $_SESSION['name'] = $record['name'];
-        $_SESSION['department'] = $record['department'];
+        $_SESSION['department'] = $record['department_name'];
         $redirectlocation = APP_PATH . "/depManPortal/index.php";
       }else {
         // Setting session variables for other users
         $_SESSION['logged'] = true;
-        $_SESSION['is_dept_manager'] = false;
+        $_SESSION['is_dept_manager'] = 0;
+        $_SESSION['employee_id'] = $record['id'];
         $_SESSION['name'] = $record['name'];
-        $_SESSION['department'] = $record['department'];
+        $_SESSION['department'] = $record['department_name'];
         $redirectlocation = APP_PATH . "/buyPortal/index.php";
       }
       header("location: {$redirectlocation}");
@@ -29,10 +32,10 @@ function loginFunc($email, $pass, $conn) {
   }
 
   // Als de while loop niets kan vinden.
-  $_SESSION['logged'] = false;
-  $_SESSION['is_dept_manager'] = false;
+  $_SESSION['logged'] = 0;
+  $_SESSION['is_dept_manager'] = 0;
   $redirectlocation = APP_PATH . "/login/index.php";
-  return header("location: {$redirectlocation}");;
+  return header("location: {$redirectlocation}");
 }
 
 // function aanmeldFunc($email, $pass, $conn) {

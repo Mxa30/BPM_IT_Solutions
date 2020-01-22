@@ -6,13 +6,13 @@
 $servername = "localhost";
 $username = "username";
 $password = "password";
-$dbname = "itsoldb";
+$dbname = "itSolutionsDB";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
 if (mysqli_connect_errno($conn)){
- $message = "Connectie Database mislukt: " . mysqli_connect_error();
- echo "<script type='text/javascript'>alert('$message');</script>";
+    $message = "Connectie Database mislukt: " . mysqli_connect_error();
+    echo "<script type='text/javascript'>alert('$message');</script>";
 }
 ?>
