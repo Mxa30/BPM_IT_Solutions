@@ -16,30 +16,36 @@ $sqlGetOrder = "
 
   $getBudget = "select 'budget'
                 from department
-                where {$_SESSION['department']};";
+                where department = '{$_SESSION['department']}';";
 
 $sqlGetBudget = mysqli_query($conn, $getBudget);
 
   $restBudget = "select 'rest_budget'
                 from department
-                where {$_SESSION['department']};";
+                where department ='{$_SESSION['department']}';";
 
 $sqlGetRestBudget = mysqli_query($conn, $RestBudget);
 
-$_SESSION = $sqlGetBudget;
+$_SESSION ['getbudget']= $sqlGetBudget;
 
-$_SESSION = $sqlGetRestBudget;
+$_SESSION ['getrestbudget']= $sqlGetRestBudget;
 
   function acceptRequest($conn, $orderId, $total) {
 
   // is budget hoger dan total dan kan je niet accepteren
-  if(){
-    function denyRequest();
-  }else {
+//   Als accept request is aangeklikt:
+//
+// rest-budget ophalen uit database en totaal van prijs in geaccepteerd bedrag eraf halen.
+//
+// rest budget = rest-budget - totaal;
+//
+//
+// naar supplier mail sturen bij accept
+
     $sqlAcceptOrderQuery = "
     UPDATE `_order`
     SET approved = '1'
-    WHERE `id` = {$orderId}";
+    WHERE `id` = '{$orderId}'";
 
     if (mysqli_query($conn, $sqlAcceptOrderQuery)) {
       //UPDATES
@@ -47,6 +53,11 @@ $_SESSION = $sqlGetRestBudget;
     }else{
       echo "Error: " . $sqlAcceptOrderQuery . "<br>" . mysqli_error($conn);
     }
+
+    if ($sqlGetRestBudget){
+      $sqlGetRestBudget = $sqlGetRestBudget-$totalPrice;
+    }
+
 
   }
   // anders kan die wel geaccepteerd worden
