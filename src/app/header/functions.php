@@ -13,4 +13,5 @@
       logOut();
     }
   }
+  $_SESSION['budget'] = $record['budget'];
 ?>
