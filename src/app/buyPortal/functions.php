@@ -13,19 +13,20 @@
   $sqlGetProdResult = mysqli_query($conn, $sqlGetProd);
 
   // Get outgoing orders
-  $sqlGetOrder = "
-    select O.id, P.name, P.price, O.amount, O.reason, O.approved, O.deny_reason, O.deliverd
-    from _Order O
-    inner join Product P on P.id = O.prod_id
-    where '{$_SESSION['employee_id']}' = O.employee_id AND
-    O.picked_up is null;";
-    $sqlGetOrderResult = mysqli_query($conn, $sqlGetOrder);
+  $sqlGetOrderReq = "
+  select O.id, P.name, P.price, O.amount, O.reason, O.approved, O.deny_reason, O.delivered
+  from _Order O
+  inner join Product P on P.id = O.prod_id
+  where '{$_SESSION['employee_id']}' = O.employee_id AND
+  O.picked_up is null;";
+
+  $sqlGetOrderReqResult = mysqli_query($conn, $sqlGetOrderReq);
 
   // Initialize cart in global scope
-  //$cart = [["id"=>1,"name"=>"Pen","supplier"=>"BIC", "price"=>15, "amount"=>12],["id"=>1,"name"=>"Printer","supplier"=>"Canon", "price"=>99.85, "amount"=>1]];
   if(!isset($_SESSION['cart'])){
     $_SESSION['cart'] = [];
   }
+
   function addToCart($id, $name, $supplier, $price, $amount) {
     // loop trough already existing cart items
     foreach ($_SESSION['cart'] as $key => $prod) {
@@ -39,27 +40,19 @@
     return getCart();
   }
 
+  function removeCartItem($prodId) {
+    foreach ($_SESSION['cart'] as $key => $prod) {
+      if ($prod['id'] == $prodId) {
+        unset($_SESSION['cart'][$key]);
+        return getCart();
+      }
+    }
+  }
+
   // Get the cart array
   function getCart() {
     return $_SESSION['cart'];
   }
-
-  // Send products in cart to Order table in database
-  // function submitCart($conn,$reason) {
-  //   $cart = getCart();
-  //   foreach ($cart as $key => $prod) {
-  //     $sqlPostOrderQuery = "
-  //     INSERT INTO `_order` (`prod_id`, `amount`, `employee_id`, `reason`)
-  //     VALUES ('{$prod['id']}', '{$_POST['amountCart' . $prod['id']]}', '{$_SESSION['employee_id']}','{$reason}');";
-  //
-  //     if (mysqli_query($conn, $sqlPostOrderQuery)) {
-  //       $_SESSION['cart'] = [];
-  //       echo "<script type='text/javascript'>alert('Verzoek verstuurd');</script>";
-  //     }else{
-  //       echo "Error: " . $sqlPostOrderQuery . "<br>" . mysqli_error($conn);
-  //     }
-  //   }
-  // }
 
   function submitCart($conn,$prod,$reason) {
       $sqlPostOrderQuery = "
@@ -67,10 +60,24 @@
       VALUES ('{$prod['id']}', '{$_POST['amountCart' . $prod['id']]}', '{$_SESSION['employee_id']}','{$reason}');";
 
       if (mysqli_query($conn, $sqlPostOrderQuery)) {
-        // echo "<script type='text/javascript'>alert('Verzoek verstuurd');</script>";
+
       }else{
         echo "Error: " . $sqlPostOrderQuery . "<br>" . mysqli_error($conn);
       }
+  }
+
+  function pickUp($conn, $orderId) {
+    $sqlPickedUpOrderQuery = "
+    UPDATE `_order`
+    SET picked_up = '1'
+    WHERE `id` = {$orderId};";
+
+    if (mysqli_query($conn, $sqlPickedUpOrderQuery)) {
+      //UPDATES
+      header("Refresh:0");
+    }else{
+      echo "Error: " . $sqlPickedUpOrderQuery . "<br>" . mysqli_error($conn);
+    }
   }
 
   // Find the rigth post request for calling the functions
@@ -79,14 +86,35 @@
       if (isset($_POST['button' . $record['id']])) {
         // Call addToCart function with the parameters form the according product
         addToCart($record['id'], $record['name'], $record['supplier'], $record['price'], $_POST['amount' . $record['id']]);
+        header("Refresh:0");
+      }
+      if (isset($_POST['removeCartItem' . $record['id']])) {
+        removeCartItem($record['id']);
+        header("Refresh:0");
       }
       if (isset($_POST['submitRequest'])) {
+        foreach ($_SESSION['cart'] as $prod) {
+          if (empty($_POST['reason' . $prod['id']])) {
+            header("Refresh:0");
+          }
+        }
         // Call the function submitCart if the button "Stuur koop-verzoek" is pressed
         foreach ($_SESSION['cart'] as $prod) {
-          submitCart($conn,$prod,$_POST['reason' . $prod['id']]);
+          if (empty($_POST['reason' . $prod['id']])) {
+            header("Refresh:0");
+          }else {
+            submitCart($conn,$prod,$_POST['reason' . $prod['id']]);
+            removeCartItem($prod['id']);
+            header("Refresh:0");
+          }
         }
-        $_SESSION['cart'] = [];
-        header("Refresh:0");
+        // $_SESSION['cart'] = [];
+
+      }
+    }
+    while($record = mysqli_fetch_assoc($sqlGetOrderReqResult)){
+      if (isset($_POST['approveDelivery' . $record['id']])) {
+        pickUp($conn, $record['id']);
       }
     }
   }
