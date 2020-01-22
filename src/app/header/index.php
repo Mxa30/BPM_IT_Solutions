@@ -2,6 +2,7 @@
     <ul class="headerInfo">
         <li><b>Naam:</b> <?php echo($_SESSION['name']) ?></li>
         <li><b>Department:</b> <?php echo($_SESSION['department']) ?></li>
+
     </ul>
     <ul class="headerNav">
       <a href="<?php echo(APP_PATH . "/buyportal/index.php");?>"><li>Koop portaal</li></a>

@@ -10,6 +10,7 @@ function loginFunc($email, $pass, $conn) {
     if (filter_var($email,FILTER_SANITIZE_EMAIL)==true || filter_var($pass,FILTER_SANITIZE_STRING)==true && $record['email'] == $email && $record['password'] == $pass) {
       if ($record['is_dept_manager'] == true) {
         // Setting session variables for department manager
+
         $_SESSION['logged'] = true;
         $_SESSION['is_dept_manager'] = true;
         $_SESSION['employee_id'] = $record['id'];

@@ -14,11 +14,38 @@ $sqlGetOrder = "
   O.approved is null;";
   $sqlGetOrderResult = mysqli_query($conn, $sqlGetOrder);
 
-  function acceptRequest($conn, $orderId) {
+  $getBudget = "select 'budget'
+                from department
+                where department = '{$_SESSION['department']}';";
+
+$sqlGetBudget = mysqli_query($conn, $getBudget);
+
+  $restBudget = "select 'rest_budget'
+                from department
+                where department ='{$_SESSION['department']}';";
+
+$sqlGetRestBudget = mysqli_query($conn, $RestBudget);
+
+$_SESSION ['getbudget']= $sqlGetBudget;
+
+$_SESSION ['getrestbudget']= $sqlGetRestBudget;
+
+  function acceptRequest($conn, $orderId, $total) {
+
+  // is budget hoger dan total dan kan je niet accepteren
+//   Als accept request is aangeklikt:
+//
+// rest-budget ophalen uit database en totaal van prijs in geaccepteerd bedrag eraf halen.
+//
+// rest budget = rest-budget - totaal;
+//
+//
+// naar supplier mail sturen bij accept
+
     $sqlAcceptOrderQuery = "
     UPDATE `_order`
     SET approved = '1'
-    WHERE `id` = {$orderId};";
+    WHERE `id` = '{$orderId}'";
 
     if (mysqli_query($conn, $sqlAcceptOrderQuery)) {
       //UPDATES
@@ -26,7 +53,25 @@ $sqlGetOrder = "
     }else{
       echo "Error: " . $sqlAcceptOrderQuery . "<br>" . mysqli_error($conn);
     }
+
+    if ($sqlGetRestBudget){
+      $sqlGetRestBudget = $sqlGetRestBudget-$totalPrice;
+    }
+
+
   }
+  // anders kan die wel geaccepteerd worden
+
+  }
+
+
+
+
+
+
+//functie totale budget;
+
+
 
   function denyRequest($conn, $orderId, $reason) {
 
@@ -46,8 +91,12 @@ $sqlGetOrder = "
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     while($record = mysqli_fetch_assoc($sqlGetOrderResult)){
       if (isset($_POST['accept' . $record['id']])) {
+        $total = $record['price'] * $record['aantal'];
+
         // Call acceptRequest function with the parameters form the according request
-        acceptRequest($conn, $record['id']);
+        acceptRequest($conn, $record['id'], $total);
+
+
       }
       if (isset($_POST['deny' . $record['id']])) {
 
